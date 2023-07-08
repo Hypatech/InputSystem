@@ -105,7 +105,7 @@ namespace UnityEngine.InputSystem.Editor
 			writer.BeginBlock();
             writer.WriteLine($"asset = InputActionAsset.FromJson(@\"{asset.ToJson().Replace("\"", "\"\"")}\");");
 			writer.EndBlock();
-			writer.WriteLine("else")
+			writer.WriteLine("else");
 			writer.BeginBlock();
 			writer.WriteLine($"asset = referencedAsset;");
 			writer.EndBlock();
