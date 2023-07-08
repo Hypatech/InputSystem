@@ -101,7 +101,7 @@ namespace UnityEngine.InputSystem.Editor
             // Default constructor.
             writer.WriteLine($"public @{options.className}(InputActionAsset referencedAsset = null)");
             writer.BeginBlock();
-			writer.WriteLine($"if(referencedAsset == null)")
+			writer.WriteLine($"if(referencedAsset == null)");
 			writer.BeginBlock();
             writer.WriteLine($"asset = InputActionAsset.FromJson(@\"{asset.ToJson().Replace("\"", "\"\"")}\");");
 			writer.EndBlock();
