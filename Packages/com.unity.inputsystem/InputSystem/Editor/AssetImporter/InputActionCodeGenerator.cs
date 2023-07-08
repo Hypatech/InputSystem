@@ -6,8 +6,6 @@ using System.Text;
 using UnityEngine.InputSystem.Utilities;
 using UnityEditor;
 
-////TODO: option to allow referencing the original asset rather than embedding it
-
 ////TODO: emit indexer directly at toplevel so you can more easily look up actions dynamically
 
 ////TODO: put the generated code behind #if that depends on input system
@@ -98,11 +96,19 @@ namespace UnityEngine.InputSystem.Editor
             writer.BeginBlock();
 
             writer.WriteLine($"public InputActionAsset asset {{ get; }}");
+			writer.WriteLine($"public bool isReferencedAsset {{ get; private set; }}");
 
             // Default constructor.
-            writer.WriteLine($"public @{options.className}()");
+            writer.WriteLine($"public @{options.className}(InputActionAsset referencedAsset = null)");
             writer.BeginBlock();
+			writer.WriteLine($"if(referencedAsset == null)")
+			writer.BeginBlock();
             writer.WriteLine($"asset = InputActionAsset.FromJson(@\"{asset.ToJson().Replace("\"", "\"\"")}\");");
+			writer.EndBlock();
+			writer.WriteLine("else")
+			writer.BeginBlock();
+			writer.WriteLine($"asset = referencedAsset;");
+			writer.EndBlock();
 
             var maps = asset.actionMaps;
             var schemes = asset.controlSchemes;
