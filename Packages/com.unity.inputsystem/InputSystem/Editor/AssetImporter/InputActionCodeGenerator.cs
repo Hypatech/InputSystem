@@ -127,7 +127,8 @@ namespace UnityEngine.InputSystem.Editor
 			// Constructor accepting a referenced asset
 			writer.WriteLine($"public @{options.className}(InputActionAsset referencedAsset)")
 			writer.BeginBlock();
-				writer.WriteLine($"asset = referencedAsset");
+				writer.WriteLine($"asset = referencedAsset;");
+				writer.WriteLine($"isReferencedAsset = true;");
 				WriteFindMaps();
 			writer.EndBlock();
 			writer.WriteLine();
