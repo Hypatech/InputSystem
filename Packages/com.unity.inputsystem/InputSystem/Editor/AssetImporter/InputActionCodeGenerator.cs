@@ -98,38 +98,43 @@ namespace UnityEngine.InputSystem.Editor
             writer.WriteLine($"public InputActionAsset asset {{ get; }}");
 			writer.WriteLine($"public bool isReferencedAsset {{ get; private set; }}");
 
-            // Default constructor.
-            writer.WriteLine($"public @{options.className}(InputActionAsset referencedAsset = null)");
-            writer.BeginBlock();
-			writer.WriteLine($"if(referencedAsset == null)");
-			writer.BeginBlock();
-            writer.WriteLine($"asset = InputActionAsset.FromJson(@\"{asset.ToJson().Replace("\"", "\"\"")}\");");
-			writer.EndBlock();
-			writer.WriteLine("else");
-			writer.BeginBlock();
-			writer.WriteLine($"asset = referencedAsset;");
-			writer.EndBlock();
-
-            var maps = asset.actionMaps;
+			var maps = asset.actionMaps;
             var schemes = asset.controlSchemes;
-            foreach (var map in maps)
-            {
-                var mapName = CSharpCodeHelpers.MakeIdentifier(map.name);
-                writer.WriteLine($"// {map.name}");
-                writer.WriteLine($"m_{mapName} = asset.FindActionMap(\"{map.name}\", throwIfNotFound: true);");
 
-                foreach (var action in map.actions)
-                {
-                    var actionName = CSharpCodeHelpers.MakeIdentifier(action.name);
-                    writer.WriteLine($"m_{mapName}_{actionName} = m_{mapName}.FindAction(\"{action.name}\", throwIfNotFound: true);");
-                }
-            }
+			void WriteFindMaps(){
+				foreach (var map in maps)
+            	{
+					var mapName = CSharpCodeHelpers.MakeIdentifier(map.name);
+					writer.WriteLine($"// {map.name}");
+					writer.WriteLine($"m_{mapName} = asset.FindActionMap(\"{map.name}\", throwIfNotFound: true);");
+
+					foreach (var action in map.actions)
+					{
+						var actionName = CSharpCodeHelpers.MakeIdentifier(action.name);
+						writer.WriteLine($"m_{mapName}_{actionName} = m_{mapName}.FindAction(\"{action.name}\", throwIfNotFound: true);");
+					}
+            	}
+			}
+
+            // Default constructor.
+            writer.WriteLine($"public @{options.className}()");
+            writer.BeginBlock();
+				writer.WriteLine($"asset = InputActionAsset.FromJson(@\"{asset.ToJson().Replace("\"", "\"\"")}\");");
+				WriteFindMaps();
             writer.EndBlock();
             writer.WriteLine();
 
+			// Constructor accepting a referenced asset
+			writer.WriteLine($"public @{options.className}(InputActionAsset referencedAsset)")
+			writer.BeginBlock();
+				writer.WriteLine($"asset = referencedAsset");
+				WriteFindMaps();
+			writer.EndBlock();
+			writer.WriteLine();
+
             writer.WriteLine("public void Dispose()");
             writer.BeginBlock();
-            writer.WriteLine("UnityEngine.Object.Destroy(asset);");
+            writer.WriteLine("if(!isReferencedAsset) UnityEngine.Object.Destroy(asset);");
             writer.EndBlock();
             writer.WriteLine();
 
