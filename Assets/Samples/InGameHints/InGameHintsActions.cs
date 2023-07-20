@@ -20,6 +20,7 @@ namespace UnityEngine.InputSystem.Samples.InGameHints
     public partial class @InGameHintsActions: IInputActionCollection2, IDisposable
     {
         public InputActionAsset asset { get; }
+        public bool isReferencedAsset { get; private set; }
         public @InGameHintsActions()
         {
             asset = InputActionAsset.FromJson(@"{
@@ -272,9 +273,22 @@ namespace UnityEngine.InputSystem.Samples.InGameHints
             m_Gameplay_Throw = m_Gameplay.FindAction("Throw", throwIfNotFound: true);
         }
 
+        public @InGameHintsActions(InputActionAsset referencedAsset)
+        {
+            asset = referencedAsset;
+            isReferencedAsset = true;
+            // Gameplay
+            m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
+            m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
+            m_Gameplay_Look = m_Gameplay.FindAction("Look", throwIfNotFound: true);
+            m_Gameplay_PickUp = m_Gameplay.FindAction("PickUp", throwIfNotFound: true);
+            m_Gameplay_Drop = m_Gameplay.FindAction("Drop", throwIfNotFound: true);
+            m_Gameplay_Throw = m_Gameplay.FindAction("Throw", throwIfNotFound: true);
+        }
+
         public void Dispose()
         {
-            UnityEngine.Object.Destroy(asset);
+            if(!isReferencedAsset) UnityEngine.Object.Destroy(asset);
         }
 
         public InputBinding? bindingMask

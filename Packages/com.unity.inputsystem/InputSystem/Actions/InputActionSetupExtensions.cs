@@ -203,23 +203,39 @@ namespace UnityEngine.InputSystem
             return action;
         }
 
-        /// <summary>
-        /// Remove the given action from its <see cref="InputActionMap"/>.
-        /// </summary>
-        /// <param name="action">An input action that is part of an <see cref="InputActionMap"/>.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="action"/> is a standalone action
-        /// that is not part of an <see cref="InputActionMap"/> and thus cannot be removed from anything.</exception>
-        /// <exception cref="InvalidOperationException"><paramref name="action"/> is part of an <see cref="InputActionMap"/>
-        /// or <see cref="InputActionAsset"/> that has at least one enabled action.</exception>
-        /// <remarks>
-        /// After removal, the action's <see cref="InputAction.actionMap"/> will be set to <c>null</c>
-        /// and the action will effectively become a standalone action that is not associated with
-        /// any action map. Bindings on the action will be preserved. On the action map, the bindings
-        /// for the action will be removed.
-        /// </remarks>
-        /// <seealso cref="AddAction"/>
-        public static void RemoveAction(this InputAction action)
+		public static InputAction AddAction(this InputActionMap map, InputAction action)
+		{
+			if (map == null)
+				throw new ArgumentNullException(nameof(map));
+			map.OnWantToChangeSetup();
+
+			if (action == null)
+				throw new ArgumentNullException(nameof(action));
+			if (action.actionMap != null)
+				throw new ArgumentException($"Cannot add action with existing map '{action.name}' to set '{map.name}'");
+
+			ArrayHelpers.Append(ref map.m_Actions, action);
+
+			return action;
+		}
+
+		/// <summary>
+		/// Remove the given action from its <see cref="InputActionMap"/>.
+		/// </summary>
+		/// <param name="action">An input action that is part of an <see cref="InputActionMap"/>.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c>.</exception>
+		/// <exception cref="ArgumentException"><paramref name="action"/> is a standalone action
+		/// that is not part of an <see cref="InputActionMap"/> and thus cannot be removed from anything.</exception>
+		/// <exception cref="InvalidOperationException"><paramref name="action"/> is part of an <see cref="InputActionMap"/>
+		/// or <see cref="InputActionAsset"/> that has at least one enabled action.</exception>
+		/// <remarks>
+		/// After removal, the action's <see cref="InputAction.actionMap"/> will be set to <c>null</c>
+		/// and the action will effectively become a standalone action that is not associated with
+		/// any action map. Bindings on the action will be preserved. On the action map, the bindings
+		/// for the action will be removed.
+		/// </remarks>
+		/// <seealso cref="AddAction"/>
+		public static void RemoveAction(this InputAction action)
         {
             if (action == null)
                 throw new ArgumentNullException(nameof(action));

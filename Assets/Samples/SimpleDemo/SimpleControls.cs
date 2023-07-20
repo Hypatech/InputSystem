@@ -18,6 +18,7 @@ using UnityEngine.InputSystem.Utilities;
 public partial class @SimpleControls: IInputActionCollection2, IDisposable
 {
     public InputActionAsset asset { get; }
+    public bool isReferencedAsset { get; private set; }
     public @SimpleControls()
     {
         asset = InputActionAsset.FromJson(@"{
@@ -167,9 +168,20 @@ public partial class @SimpleControls: IInputActionCollection2, IDisposable
         m_gameplay_look = m_gameplay.FindAction("look", throwIfNotFound: true);
     }
 
+    public @SimpleControls(InputActionAsset referencedAsset)
+    {
+        asset = referencedAsset;
+        isReferencedAsset = true;
+        // gameplay
+        m_gameplay = asset.FindActionMap("gameplay", throwIfNotFound: true);
+        m_gameplay_fire = m_gameplay.FindAction("fire", throwIfNotFound: true);
+        m_gameplay_move = m_gameplay.FindAction("move", throwIfNotFound: true);
+        m_gameplay_look = m_gameplay.FindAction("look", throwIfNotFound: true);
+    }
+
     public void Dispose()
     {
-        UnityEngine.Object.Destroy(asset);
+        if(!isReferencedAsset) UnityEngine.Object.Destroy(asset);
     }
 
     public InputBinding? bindingMask
